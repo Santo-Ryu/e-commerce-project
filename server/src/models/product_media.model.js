@@ -1,5 +1,5 @@
 const {DataTypes, ENUM} = require('sequelize')
-const sequelize = require('../config/db');
+const { sequelize } = require("../config/db");
 const Product = require('./product.model');
 
 const ProductMedia = sequelize.define('ProductMedia', {

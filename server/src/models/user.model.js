@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize')
-const sequelize = require('../config/db')
+const { sequelize } = require("../config/db");
 const UserImage = require('./user_image.model');
 
 const User = sequelize.define('User', {
@@ -52,7 +52,17 @@ const User = sequelize.define('User', {
     updatedAt: 'updated_at',
     paranoid: true,
     deletedAt: 'deleted_at',
-    freezeTableName: true
+    freezeTableName: true,
+    defaultScope: {
+        attributes: { exclude: ['password'] }
+    },
+    instanceMethods: {
+        toJSON: function () {
+            const values = Object.assign({}, this.get());
+            delete values.password;
+            return values;
+        }
+    }
 });
 
 User.belongsTo(UserImage, {

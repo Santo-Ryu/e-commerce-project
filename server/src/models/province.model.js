@@ -1,5 +1,5 @@
 const {DataTypes} = require('sequelize')
-const sequelize = require('../config/db');
+const { sequelize } = require("../config/db");
 const AdministrativeRegion = require('./administrative_region.model');
 const AdministrativeUnit = require('./administrative_unit.model');
 
