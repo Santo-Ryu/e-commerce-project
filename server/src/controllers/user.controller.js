@@ -10,4 +10,11 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers };
+const registerUser = async (req, res) => {
+
+}
+
+module.exports = { 
+    getAllUsers,
+    registerUser
+};

@@ -1,7 +1,7 @@
 const {DataTypes} = require('sequelize')
 const { sequelize } = require("../config/db");
 const Category = require('./category.model');
-const Seller = require('./seller.model');
+const Brand = require('./brand.model');
 
 const Product = sequelize.define('Product', {
     id: {
@@ -16,7 +16,7 @@ const Product = sequelize.define('Product', {
     category_id: {
         type: DataTypes.BIGINT
     },
-    seller_id: {
+    brand_id: {
         type: DataTypes.BIGINT,
         allowNull: false
     },
@@ -74,9 +74,9 @@ Product.belongsTo(Category, {
     as: 'category'
 });
 
-Product.belongsTo(Seller, {
-    foreignKey: 'seller_id',
-    as: 'seller'
+Product.belongsTo(Brand, {
+    foreignKey: 'brand_id',
+    as: 'brand'
 });
 
 module.exports = Product

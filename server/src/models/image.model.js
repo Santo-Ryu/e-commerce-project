@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/db");
 
-const UserImage = sequelize.define('UserImage', {
+const Image = sequelize.define('Image', {
     id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -13,11 +13,11 @@ const UserImage = sequelize.define('UserImage', {
         unique: true
     }
 }, {
-    tableName: 'user_images',
+    tableName: 'images',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     freezeTableName: true
 });
 
-module.exports = UserImage
+module.exports = Image

@@ -17,11 +17,14 @@ const OrderItem = sequelize.define('OrderItem', {
         type: DataTypes.BIGINT,
         allowNull: false
     },
-    quantity: {
+    product_name: {
+        type: DataTypes.STRING(255)
+    },
+    price: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    price: {
+    quantity: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
@@ -34,7 +37,7 @@ const OrderItem = sequelize.define('OrderItem', {
         type: DataTypes.ENUM('not_requested', 'requested', 'approved', 'rejected', 'returned'),
         defaultValue: 'not_requested'
     },
-    sub_total: {
+    final_total: {
         type: DataTypes.INTEGER,
         allowNull: false
     }

@@ -1,8 +1,8 @@
 -- CREATE DATABASE e_commerce_project
 -- USE e_commerce_project
 
-/* Hình ảnh của người dùng */
-CREATE TABLE user_images(
+/* Hình ảnh của người dùng - brand */
+CREATE TABLE images(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -24,7 +24,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    CONSTRAINT fk_users_images FOREIGN KEY (image_id) REFERENCES user_images(id)
+    CONSTRAINT fk_users_images FOREIGN KEY (image_id) REFERENCES images(id)
     ON DELETE SET NULL ON UPDATE CASCADE -- Đặt image_id thành NULL khi xóa ảnh
 );
 
@@ -49,6 +49,20 @@ CREATE TABLE sellers (
     CONSTRAINT fk_sellers_districts FOREIGN KEY (district_code) REFERENCES districts(code)
     ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_sellers_wards FOREIGN KEY (ward_code) REFERENCES wards(code)
+    ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE brands (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    seller_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    image_id BIGINT,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (seller_id) REFERENCES sellers(id)
+    ON DELETE CASCADE,
+    FOREIGN KEY (image_id) REFERENCES images(id)
     ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -123,7 +137,7 @@ CREATE TABLE products (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(200) NOT NULL,
     category_id BIGINT,
-    seller_id BIGINT NOT NULL,
+    brand_id BIGINT NOT NULL,
     description LONGTEXT NOT NULL,
     rating DECIMAL(3,1) NULL,
     sales_count INT NOT NULL DEFAULT 0,
@@ -139,7 +153,7 @@ CREATE TABLE products (
     
     CONSTRAINT fk_products_categories FOREIGN KEY (category_id) REFERENCES categories(id)
     ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT fk_products_users FOREIGN KEY (seller_id) REFERENCES users(id)
+    CONSTRAINT fk_products_brands FOREIGN KEY (brand_id) REFERENCES brands(id)
     ON DELETE CASCADE
 );
 
@@ -236,16 +250,19 @@ CREATE TABLE orders (
     ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-/* Vật phẩm đơn hàng */
+/* Vật phẩm đơn hàng
+	product_name: tránh hiển thị tên null khi sản phẩm bị xóa
+ */
 CREATE TABLE order_items (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     order_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
-    quantity INT NOT NULL,
+    product_name VARCHAR(255),
     price INT NOT NULL,
+    quantity INT NOT NULL,
     discount_percent INT NOT NULL DEFAULT 0,
     return_status ENUM('not_requested', 'requested', 'approved', 'rejected', 'returned') DEFAULT 'not_requested',
-    sub_total INT NOT NULL,
+    final_price INT NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -365,4 +382,40 @@ CREATE TABLE activity_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_activity_logs_users FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+/* Điều chỉnh % chiết khấu
+	seller_id: NULL -> áp dụng cho toàn bộ hệ thống, ngược lại chỉ áp dụng cho 1 số seller
+	commission_percent: % chiết khấu
+	effective_from: ngày có hiệu lực
+ */
+CREATE TABLE commission_settings(
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    brand_id BIGINT NULL,
+    commission_percent INT NOT NULL,
+    effective_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (brand_id) REFERENCES brands(id)
+);
+
+/* Thống kê doanh thu 
+	total_amount: tổng tiền của đơn
+    commission_percent: chiết khấu
+    seller_receive_amount: seller nhận tiền sau chiết khấu
+    admin_receive_amount: admin nhận tiền sau chiết khấu
+*/
+CREATE TABLE commission_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    brand_id BIGINT,
+    order_id BIGINT,
+    total_amount INT NOT NULL,
+    commission_setting_id BIGINT NOT NULL,
+    seller_receive_amount INT NOT NULL,
+    admin_receive_amount INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (brand_id) REFERENCES brands(id),
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    
+    FOREIGN KEY (commission_setting_id) REFERENCES commission_settings(id)
 );

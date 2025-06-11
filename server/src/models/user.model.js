@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize')
 const { sequelize } = require("../config/db");
-const UserImage = require('./user_image.model');
+const Image = require('./image.model');
 
 const User = sequelize.define('User', {
     id: {
@@ -65,7 +65,7 @@ const User = sequelize.define('User', {
     }
 });
 
-User.belongsTo(UserImage, {
+User.belongsTo(Image, {
     foreignKey: 'image_id',
     as: 'image'
 });
