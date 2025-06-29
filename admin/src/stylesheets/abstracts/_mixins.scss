@@ -1,0 +1,29 @@
+@use '../abstracts/_functions' as *;
+@use '../abstracts//variables' as *;
+
+// Responsive mixins for media queries
+@mixin respond($breakpoint) {
+    @if $breakpoint == small {
+        @media (max-width: $screen-small) { 
+            @content;
+        }
+    }
+    @if $breakpoint == medium {
+        @media (min-width: $screen-small) and (max-width: $screen-medium) {
+            @content;
+        }
+    }
+    @if $breakpoint == large {
+        @media (min-width: $screen-large) {
+            @content; 
+        }
+    }
+}
+
+// Display
+@mixin flex-layout($display: flex, $justify: center, $align: center, $direction: row) {
+    display: $display;
+    justify-content: $justify;
+    align-items: $align;
+    flex-direction: $direction;
+}
